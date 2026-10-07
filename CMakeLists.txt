@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.28)
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
-    project(PlayersHudSlider VERSION 1.1.15 LANGUAGES CXX RC)
+    project(PlayersHudSlider VERSION 1.1.16 LANGUAGES CXX RC)
     set(PLAYERS_HUD_PLUGIN_SDK_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/PluginSDK")
     add_library(D2RLPlugin INTERFACE)
     add_library(D2RLPlugin::D2RLPlugin ALIAS D2RLPlugin)

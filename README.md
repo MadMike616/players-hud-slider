@@ -5,7 +5,7 @@ Players HUD Slider is a standalone D2RLoader plugin for changing the Offline
 drag to a player count, then release to apply the value and close the slider.
 The slider ranges from 1 to `maxPlayers` in `d2rloader/data/state.json`.
 
-The plugin includes the source artwork and generated native `.sprite` resources.
+The plugin reports `MadMike` as its author in D2RLoader. It includes the source artwork and generated native `.sprite` resources.
 Its CMake configure step regenerates the native sprites from the PNG artwork.
 The prebuilt DLL is in [`dist`](dist/), and the loader config template is in
 [`config`](config/).
@@ -48,7 +48,7 @@ The plugin targets D2RLoader ABI 4 and was built for the D2R 3.3.93847
 reference layout. It validates native signatures and leaves an unknown game
 layout untouched.
 
-The v1.1.15 DLL SHA-256 is recorded in
+The v1.1.16 DLL SHA-256 is recorded in
 [`dist/SHA256SUMS.txt`](dist/SHA256SUMS.txt).
 
 ## Assets

@@ -61,8 +61,8 @@ constexpr D2RL::PluginInfo Info{
     .apiVersion = D2RL_PLUGIN_API_VERSION,
     .id = "players-hud-slider",
     .name = "Players HUD Slider",
-    .version = "1.1.15",
-    .author = "Community",
+    .version = "1.1.16",
+    .author = "MadMike",
     .description = "In-game /players slider attached to the HUD.",
     .flags = D2RL::PluginFlags::Shared | D2RL::PluginFlags::NativeHooks,
 };
