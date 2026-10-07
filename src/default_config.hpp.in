@@ -1,0 +1,4 @@
+#pragma once
+namespace players_hud_slider {
+inline constexpr char DefaultConfig[] = R"toml(@PLAYERS_HUD_SLIDER_DEFAULT_TOML@)toml";
+}

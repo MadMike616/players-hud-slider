@@ -60,4 +60,3 @@ included in the repository.
 
 See [third-party notices](THIRD_PARTY_NOTICES.md) for SDK and dependency
 licenses.
-

@@ -1,0 +1,45 @@
+[hud-player-slider]
+enabled = true
+state-max-fallback = 8
+
+# Coordinates use a 3200 x 1801 design canvas and scale to the game window.
+# Change x/y/width/height on each element to reposition or resize it.
+[hud-player-slider.button]
+x = 1571
+y = 1708
+width = 58
+height = 58
+
+[hud-player-slider.track]
+x = 960
+y = 1612
+width = 1280
+height = 34
+
+# marker.x/y set the p1 marker's top-left. Its pX endpoint is derived evenly
+# from track.width.
+[hud-player-slider.marker]
+x = 970
+y = 1593
+width = 54
+height = 72
+
+# Tooltip position is relative to the marker; tooltip-text is relative to it.
+[hud-player-slider.tooltip]
+x = -32
+y = -68
+width = 118
+height = 48
+
+[hud-player-slider.tooltip-text]
+x = 0
+y = 0
+width = 118
+height = 48
+
+# Tick offsets use the marker center and track center as their origin.
+[hud-player-slider.tick]
+x = 0
+y = 0
+width = 2
+height = 10
