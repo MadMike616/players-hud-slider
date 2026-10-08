@@ -15,7 +15,7 @@ The prebuilt DLL is in [`dist`](dist/), and the loader config template is in
 Copy `dist/d2rl-players-hud-slider.dll` to:
 
 ```text
-mods/*mod*/d2rloader/plugins/d2rl-players-hud-slider.dll
+mods/<mod name>/d2rloader/plugins/d2rl-players-hud-slider.dll
 ```
 
 On first launch, D2RLoader creates
