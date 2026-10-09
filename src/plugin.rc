@@ -11,20 +11,20 @@ PLAYERS_HUD_NATIVE_MARKER_RESOURCE_ID RCDATA "../assets/native/native-marker.spr
 PLAYERS_HUD_NATIVE_TOOLTIP_RESOURCE_ID RCDATA "../assets/native/native-tooltip.sprite"
 PLAYERS_HUD_NATIVE_BUTTON_RESOURCE_ID RCDATA "../assets/native/native-button.sprite"
 1 VERSIONINFO
-FILEVERSION 1,1,15,0
-PRODUCTVERSION 1,1,15,0
+FILEVERSION 1,1,17,0
+PRODUCTVERSION 1,1,17,0
 BEGIN
   BLOCK "StringFileInfo"
   BEGIN
     BLOCK "040904B0"
     BEGIN
-      VALUE "CompanyName", "Community"
+      VALUE "CompanyName", "MadMike"
       VALUE "FileDescription", "In-game /players HUD slider for D2RLoader."
-      VALUE "FileVersion", "1.1.15"
+      VALUE "FileVersion", "1.1.17"
       VALUE "InternalName", "players-hud-slider"
       VALUE "OriginalFilename", "d2rl-players-hud-slider.dll"
       VALUE "ProductName", "Players HUD Slider"
-      VALUE "ProductVersion", "1.1.15"
+      VALUE "ProductVersion", "1.1.17"
     END
   END
   BLOCK "VarFileInfo"

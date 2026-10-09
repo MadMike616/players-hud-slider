@@ -13,12 +13,10 @@
 #include <charconv>
 #include <cctype>
 #include <cstdint>
-#include <cstring>
 #include <cstdio>
 #include <filesystem>
 #include <fstream>
 #include <iterator>
-#include <limits>
 #include <string>
 #include <string_view>
 #include <system_error>
@@ -61,7 +59,7 @@ constexpr D2RL::PluginInfo Info{
     .apiVersion = D2RL_PLUGIN_API_VERSION,
     .id = "players-hud-slider",
     .name = "Players HUD Slider",
-    .version = "1.1.16",
+    .version = "1.1.17",
     .author = "MadMike",
     .description = "In-game /players slider attached to the HUD.",
     .flags = D2RL::PluginFlags::Shared | D2RL::PluginFlags::NativeHooks,
@@ -70,76 +68,6 @@ constexpr D2RL::PluginInfo Info{
 template<class Function>
 auto At(std::uintptr_t rva) noexcept -> Function {
     return reinterpret_cast<Function>(Base + rva);
-}
-
-auto IsReadableRange(std::uintptr_t address, std::size_t size) noexcept -> bool {
-    if (address == 0 || size == 0
-            || address > (std::numeric_limits<std::uintptr_t>::max)() - size) {
-        return false;
-    }
-    const auto end = address + size;
-    auto cursor = address;
-    while (cursor < end) {
-        MEMORY_BASIC_INFORMATION memory{};
-        if (VirtualQuery(reinterpret_cast<const void*>(cursor), &memory,
-                sizeof(memory)) != sizeof(memory)
-                || memory.State != MEM_COMMIT
-                || (memory.Protect & (PAGE_GUARD | PAGE_NOACCESS)) != 0
-                || memory.RegionSize == 0) {
-            return false;
-        }
-        const auto regionBase =
-            reinterpret_cast<std::uintptr_t>(memory.BaseAddress);
-        if (regionBase > (std::numeric_limits<std::uintptr_t>::max)()
-                - memory.RegionSize) {
-            return false;
-        }
-        const auto regionEnd = regionBase + memory.RegionSize;
-        if (cursor < regionBase || cursor >= regionEnd) return false;
-        cursor = (std::min)(end, regionEnd);
-    }
-    return true;
-}
-
-template<std::size_t Size>
-auto Matches(std::uintptr_t rva,
-        const std::array<std::uint8_t, Size>& expected) noexcept -> bool {
-    if (Base == 0
-            || Base > (std::numeric_limits<std::uintptr_t>::max)() - rva) {
-        return false;
-    }
-    const auto address = Base + rva;
-    return IsReadableRange(address, expected.size())
-        && std::memcmp(reinterpret_cast<const void*>(address),
-            expected.data(), expected.size()) == 0;
-}
-
-auto ValidateNativeLayout() noexcept -> bool {
-    const bool valid =
-        Matches(native::ArtificialPlayerCountSetterRva,
-            native::ArtificialPlayerCountSetterEntry)
-        && Matches(native::PlayersCommandModeRva,
-            native::PlayersCommandModeEntry)
-        && Matches(native::PlayersCommandCommitRva,
-            native::PlayersCommandCommitEntry)
-        && Matches(native::PlayersCommandCommitCallRva,
-            native::PlayersCommandCommitCall)
-        && Matches(native::SetPlayerCountRva, native::SetPlayerCountEntry)
-        && Matches(native::SetOfflineDifficultyRangeRva,
-            native::SetOfflineDifficultyRangeEntry)
-        && Matches(native::SetOfflineDifficultyRangeCallerRva,
-            native::SetOfflineDifficultyRangeCaller)
-        && Matches(native::OfflineDifficultyGetterRva,
-            native::OfflineDifficultyGetterEntry)
-        && Matches(native::OfflineDifficultyGetterReturnRva,
-            native::OfflineDifficultyGetterReturn)
-        && Matches(native::PlayersOfflineDifficultySetterContextRva,
-            native::PlayersOfflineDifficultySetterContext);
-    if (!valid && Context != nullptr) {
-        Context->LogError(
-            "Players HUD Slider: native signatures do not match the supported game layout; the plugin refused to load.");
-    }
-    return valid;
 }
 
 auto ConfigPath() -> std::filesystem::path {
@@ -382,7 +310,7 @@ D2RL_PLUGIN_EXPORT auto D2RLoaderLoadPlugin(
 
     MaximumPlayers = ReadLoaderMaximumPlayers(
         context, Config.slider.stateMaxFallback);
-    if (!AcquireNativeOwner() || !ValidateNativeLayout()) {
+    if (!AcquireNativeOwner()) {
         ReleaseNativeOwner();
         return false;
     }
@@ -421,7 +349,7 @@ D2RL_PLUGIN_EXPORT auto D2RLoaderLoadPlugin(
     }
 
     D2RL::LogInfoF(Context,
-        "Players HUD Slider 1.1.15 active; maximum players=%d.",
+        "Players HUD Slider 1.1.17 active; maximum players=%d.",
         MaximumPlayers);
     return true;
 }

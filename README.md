@@ -5,7 +5,7 @@ Players HUD Slider is a standalone D2RLoader plugin for changing the Offline
 drag to a player count, then release to apply the value and close the slider.
 The slider ranges from 1 to `maxPlayers` in `d2rloader/data/state.json`.
 
-It includes the source artwork and generated native `.sprite` resources.
+The plugin reports `MadMike` as its author in D2RLoader. It includes the source artwork and generated native `.sprite` resources.
 Its CMake configure step regenerates the native sprites from the PNG artwork.
 The prebuilt DLL is in [`dist`](dist/), and the loader config template is in
 [`config`](config/).
@@ -15,7 +15,7 @@ The prebuilt DLL is in [`dist`](dist/), and the loader config template is in
 Copy `dist/d2rl-players-hud-slider.dll` to:
 
 ```text
-mods/<mod name>/d2rloader/plugins/d2rl-players-hud-slider.dll
+mods/GrailerRL/d2rloader/plugins/d2rl-players-hud-slider.dll
 ```
 
 On first launch, D2RLoader creates
@@ -44,11 +44,12 @@ Release DLL is `build/d2rl-players-hud-slider.dll`.
 
 ## Compatibility
 
-The plugin targets D2RLoader ABI 4 and was built for the D2R 3.3.93847
-reference layout. It validates native signatures and leaves an unknown game
-layout untouched.
+The plugin targets D2RLoader ABI 4 and uses native addresses from the D2R
+3.3.93847 reference layout. Version 1.1.17 removes the exact-byte startup
+signature check. It keeps those fixed addresses, so other game layouts are not
+automatically supported.
 
-The v1.1.16 DLL SHA-256 is recorded in
+The v1.1.17 DLL SHA-256 is recorded in
 [`dist/SHA256SUMS.txt`](dist/SHA256SUMS.txt).
 
 ## Assets
