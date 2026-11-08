@@ -8,7 +8,7 @@
 
 - D2RLoader ABI 4
 - Addresses remain based on the D2R 3.3.93847 reference layout
-- Install the DLL in `mods/GrailerRL/d2rloader/plugins/`.
+- Install the DLL in `mods/<mod>/d2rloader/plugins/`.
 
 ## SHA-256
 

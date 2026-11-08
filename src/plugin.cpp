@@ -56,10 +56,10 @@ PlayerHudSlider HudSlider{};
 
 constexpr D2RL::PluginInfo Info{
     .infoSize = D2RL::PluginInfoSize,
-    .apiVersion = D2RL_PLUGIN_API_VERSION,
+    .abiVersion = D2RL_PLUGIN_ABI_VERSION,
     .id = "players-hud-slider",
     .name = "Players HUD Slider",
-    .version = "1.1.17",
+    .version = "1.1.18",
     .author = "MadMike",
     .description = "In-game /players slider attached to the HUD.",
     .flags = D2RL::PluginFlags::Shared | D2RL::PluginFlags::NativeHooks,
@@ -295,7 +295,7 @@ D2RL_PLUGIN_EXPORT auto D2RLoaderGetPluginInfo() noexcept
 D2RL_PLUGIN_EXPORT auto D2RLoaderLoadPlugin(
         const D2RL::PluginContext* context) noexcept -> bool {
     if (!D2RL::HasContext(context)
-            || context->apiVersion != D2RL_PLUGIN_API_VERSION) {
+            || context->abiVersion != D2RL_PLUGIN_ABI_VERSION) {
         return false;
     }
     Context = context;
@@ -349,7 +349,7 @@ D2RL_PLUGIN_EXPORT auto D2RLoaderLoadPlugin(
     }
 
     D2RL::LogInfoF(Context,
-        "Players HUD Slider 1.1.17 active; maximum players=%d.",
+        "Players HUD Slider 1.1.18 active; maximum players=%d.",
         MaximumPlayers);
     return true;
 }

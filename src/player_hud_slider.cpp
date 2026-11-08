@@ -276,11 +276,10 @@ void PlayerHudSlider::SetCurrentPlayers(std::int32_t players) noexcept {
 }
 
 auto PlayerHudSlider::RegisterListeners() noexcept -> bool {
-    if (context_->QueryService(D2RL::ServiceId::Lifecycle,
-            D2RL::LifecycleServiceV1Version, &lifecycle_)
+    if (context_->QueryService(&lifecycle_)
             != D2RL::ServiceQueryResult::Success
-            || !D2RL::HasLifecycleServiceV1Field(lifecycle_,
-                D2RL::LifecycleServiceV1RequiredSize)
+            || !D2RL::HasLifecycleServiceField(lifecycle_,
+                D2RL::LifecycleServiceRequiredSize)
             || lifecycle_->registerGameplayEventListener == nullptr
             || lifecycle_->unregisterGameplayEventListener == nullptr) {
         lifecycle_ = nullptr;

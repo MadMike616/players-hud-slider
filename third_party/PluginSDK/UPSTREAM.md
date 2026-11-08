@@ -1,21 +1,18 @@
 # D2RLoader PluginSDK upstream pin
 
-This directory contains the minimal build files and headers required to compile
+This directory vendors the SDK headers and CMake helpers required to compile
 Players HUD Slider from the official D2RLoader PluginSDK repository.
 
 - Repository: https://github.com/D2RLoader/PluginSDK
-- Tag: `v3`
-- Commit: `4933e2c42cb2592958cd0df3b6dc5003102252d1`
+- SDK release: 0.4.0
+- Plugin ABI: 4
+- Source ref: `master`
+- Commit: `03a5af9e0feb3f95f95e148e330e01f6635950df`
 - License: MIT; see `LICENSE`
 
-The following files are copied byte-for-byte from that upstream commit:
+All files under `include/D2RLPlugin/`, the three CMake resource/configuration
+helpers under `cmake/`, and `LICENSE` are copied from that upstream commit.
 
-- `include/D2RLPlugin/*.h`
-- `cmake/D2RLPluginConfig.cmake`
-- `cmake/D2RLPluginEmbedConfig.cmake`
-- `cmake/D2RLPluginConfigResource.rc.in`
-- `LICENSE`
-
-`UPSTREAM-SHA256.txt` records the checksums for the copied upstream files.
-The root project CMake file creates the SDK interface target and includes the
-official embedded-config helper.
+`UPSTREAM-SHA256.txt` records checksums for the copied upstream files.
+The root CMake file creates the SDK interface target and includes the official
+embedded-config helper.

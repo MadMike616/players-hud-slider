@@ -352,11 +352,10 @@ auto NativeSliderPanel::Start(
     context_ = context;
     buttonClick_ = buttonClick;
     buttonClickUserData_ = buttonClickUserData;
-    if (context_->QueryService(D2RL::ServiceId::Resource,
-            D2RL::ResourceServiceV1Version, &resources_)
+    if (context_->QueryService(&resources_)
                 != D2RL::ServiceQueryResult::Success
-            || !D2RL::HasResourceServiceV1Field(resources_,
-                D2RL::ResourceServiceV1RequiredSize)
+            || !D2RL::HasResourceServiceField(resources_,
+                D2RL::ResourceServiceRequiredSize)
             || resources_->registerResource == nullptr
             || resources_->unregisterResource == nullptr) {
         context_->LogWarn(
@@ -364,11 +363,10 @@ auto NativeSliderPanel::Start(
         Cleanup();
         return false;
     }
-    if (context_->QueryService(D2RL::ServiceId::Panel,
-            D2RL::PanelServiceV1Version, &panels_)
+    if (context_->QueryService(&panels_)
                 != D2RL::ServiceQueryResult::Success
-            || !D2RL::HasPanelServiceV1Field(panels_,
-                D2RL::PanelServiceV1RequiredSize)
+            || !D2RL::HasPanelServiceField(panels_,
+                D2RL::PanelServiceRequiredSize)
             || panels_->registerPanel == nullptr
             || panels_->unregisterPanel == nullptr
             || panels_->getPanelInfo == nullptr
@@ -379,11 +377,10 @@ auto NativeSliderPanel::Start(
         Cleanup();
         return false;
     }
-    if (context_->QueryService(D2RL::ServiceId::SharedEvent,
-            D2RL::SharedEventServiceV1Version, &events_)
+    if (context_->QueryService(&events_)
                 != D2RL::ServiceQueryResult::Success
-            || !D2RL::HasSharedEventServiceV1Field(events_,
-                D2RL::SharedEventServiceV1RequiredSize)
+            || !D2RL::HasSharedEventServiceField(events_,
+                D2RL::SharedEventServiceRequiredSize)
             || events_->registerUiMessageListener == nullptr
             || events_->unregisterUiMessageListener == nullptr) {
         context_->LogWarn(
@@ -391,11 +388,10 @@ auto NativeSliderPanel::Start(
         Cleanup();
         return false;
     }
-    if (context_->QueryService(D2RL::ServiceId::Widget,
-            D2RL::WidgetServiceV1Version, &widgets_)
+    if (context_->QueryService(&widgets_)
                 != D2RL::ServiceQueryResult::Success
-            || !D2RL::HasWidgetServiceV1Field(widgets_,
-                D2RL::WidgetServiceV1RequiredSize)
+            || !D2RL::HasWidgetServiceField(widgets_,
+                D2RL::WidgetServiceRequiredSize)
             || widgets_->findPanel == nullptr
             || widgets_->findWidget == nullptr
             || widgets_->setWidgetVisible == nullptr) {
@@ -404,11 +400,10 @@ auto NativeSliderPanel::Start(
         Cleanup();
         return false;
     }
-    if (context_->QueryService(D2RL::ServiceId::Thread,
-            D2RL::ThreadServiceV1Version, &threads_)
+    if (context_->QueryService(&threads_)
                 != D2RL::ServiceQueryResult::Success
-            || !D2RL::HasThreadServiceV1Field(threads_,
-                D2RL::ThreadServiceV1RequiredSize)
+            || !D2RL::HasThreadServiceField(threads_,
+                D2RL::ThreadServiceRequiredSize)
             || threads_->runOnUiThread == nullptr) {
         threads_ = nullptr;
         context_->LogWarn(
@@ -417,12 +412,16 @@ auto NativeSliderPanel::Start(
     maximumPlayers_ = std::clamp(maximumPlayers, 1,
         MaximumHudPlayerCount);
 
-    std::array<std::vector<std::uint8_t>, 4> sprites;
+    std::array<std::vector<std::uint8_t>, 8> sprites;
     constexpr std::array resourceIds{
         PLAYERS_HUD_NATIVE_TRACK_RESOURCE_ID,
         PLAYERS_HUD_NATIVE_MARKER_RESOURCE_ID,
         PLAYERS_HUD_NATIVE_TOOLTIP_RESOURCE_ID,
         PLAYERS_HUD_NATIVE_BUTTON_RESOURCE_ID,
+        PLAYERS_HUD_NATIVE_TRACK_LOWEND_RESOURCE_ID,
+        PLAYERS_HUD_NATIVE_MARKER_LOWEND_RESOURCE_ID,
+        PLAYERS_HUD_NATIVE_TOOLTIP_LOWEND_RESOURCE_ID,
+        PLAYERS_HUD_NATIVE_BUTTON_LOWEND_RESOURCE_ID,
     };
     for (std::size_t i = 0; i < resourceIds.size(); ++i) {
         if (!LoadEmbeddedResource(resourceIds[i], sprites[i])) {
@@ -437,6 +436,10 @@ auto NativeSliderPanel::Start(
         MarkerSpriteResourcePath,
         TooltipSpriteResourcePath,
         HudButtonSpriteResourcePath,
+        TrackLowendSpriteResourcePath,
+        MarkerLowendSpriteResourcePath,
+        TooltipLowendSpriteResourcePath,
+        HudButtonLowendSpriteResourcePath,
     };
     for (std::size_t i = 0; i < spritePaths.size(); ++i) {
         if (!RegisterResource(spritePaths[i], sprites[i].data(),

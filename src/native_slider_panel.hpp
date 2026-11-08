@@ -56,13 +56,21 @@ private:
         "data/global/ui/layouts/players-hud-slider/HudButtonhd.json";
     static constexpr char HudButtonSpriteResourcePath[] =
         "data/hd/global/ui/d2rloader/players-hud-slider/native-button.sprite";
+    static constexpr char TrackLowendSpriteResourcePath[] =
+        "data/hd/global/ui/d2rloader/players-hud-slider/native-track.lowend.sprite";
+    static constexpr char MarkerLowendSpriteResourcePath[] =
+        "data/hd/global/ui/d2rloader/players-hud-slider/native-marker.lowend.sprite";
+    static constexpr char TooltipLowendSpriteResourcePath[] =
+        "data/hd/global/ui/d2rloader/players-hud-slider/native-tooltip.lowend.sprite";
+    static constexpr char HudButtonLowendSpriteResourcePath[] =
+        "data/hd/global/ui/d2rloader/players-hud-slider/native-button.lowend.sprite";
 
     const D2RL::PluginContext* context_{};
-    const D2RL::ResourceServiceV1* resources_{};
-    const D2RL::PanelServiceV1* panels_{};
-    const D2RL::SharedEventServiceV1* events_{};
-    const D2RL::ThreadServiceV1* threads_{};
-    const D2RL::WidgetServiceV1* widgets_{};
+    const D2RL::ResourceService* resources_{};
+    const D2RL::PanelService* panels_{};
+    const D2RL::SharedEventService* events_{};
+    const D2RL::ThreadService* threads_{};
+    const D2RL::WidgetService* widgets_{};
     D2RL::Panels::RegistrationHandle panelHandle_{
         D2RL::Panels::InvalidHandle};
     D2RL::Panels::RegistrationHandle hudButtonPanelHandle_{
@@ -73,7 +81,7 @@ private:
         D2RL::Resources::InvalidHandle};
     D2RL::Resources::RegistrationHandle hudButtonLayoutHandle_{
         D2RL::Resources::InvalidHandle};
-    std::array<D2RL::Resources::RegistrationHandle, 4> spriteHandles_{};
+    std::array<D2RL::Resources::RegistrationHandle, 8> spriteHandles_{};
     ButtonClick buttonClick_{};
     void* buttonClickUserData_{};
     std::int32_t maximumPlayers_{1};

@@ -1,7 +1,7 @@
 #include <D2RLPlugin/resource.h>
 #include <D2RLPlugin/version.h>
 #include "resource_ids.h"
-D2RL_PLUGIN_MANIFEST_RESOURCE_ID RCDATA { D2RL_PLUGIN_RESOURCE_DWORD(D2RL_PLUGIN_API_VERSION) }
+D2RL_PLUGIN_MANIFEST_RESOURCE_ID RCDATA { D2RL_PLUGIN_RESOURCE_DWORD(D2RL_PLUGIN_ABI_VERSION) }
 PLAYERS_HUD_BUTTON_RESOURCE_ID RCDATA "../assets/artwork/hud-player-slider-button.png"
 PLAYERS_HUD_TRACK_RESOURCE_ID RCDATA "../assets/artwork/hud-player-slider-track.png"
 PLAYERS_HUD_MARKER_RESOURCE_ID RCDATA "../assets/artwork/hud-player-slider-marker.png"
@@ -10,9 +10,13 @@ PLAYERS_HUD_NATIVE_TRACK_RESOURCE_ID RCDATA "../assets/native/native-track.sprit
 PLAYERS_HUD_NATIVE_MARKER_RESOURCE_ID RCDATA "../assets/native/native-marker.sprite"
 PLAYERS_HUD_NATIVE_TOOLTIP_RESOURCE_ID RCDATA "../assets/native/native-tooltip.sprite"
 PLAYERS_HUD_NATIVE_BUTTON_RESOURCE_ID RCDATA "../assets/native/native-button.sprite"
+PLAYERS_HUD_NATIVE_TRACK_LOWEND_RESOURCE_ID RCDATA "../assets/native/native-track.lowend.sprite"
+PLAYERS_HUD_NATIVE_MARKER_LOWEND_RESOURCE_ID RCDATA "../assets/native/native-marker.lowend.sprite"
+PLAYERS_HUD_NATIVE_TOOLTIP_LOWEND_RESOURCE_ID RCDATA "../assets/native/native-tooltip.lowend.sprite"
+PLAYERS_HUD_NATIVE_BUTTON_LOWEND_RESOURCE_ID RCDATA "../assets/native/native-button.lowend.sprite"
 1 VERSIONINFO
-FILEVERSION 1,1,17,0
-PRODUCTVERSION 1,1,17,0
+FILEVERSION 1,1,18,0
+PRODUCTVERSION 1,1,18,0
 BEGIN
   BLOCK "StringFileInfo"
   BEGIN
@@ -20,11 +24,11 @@ BEGIN
     BEGIN
       VALUE "CompanyName", "MadMike"
       VALUE "FileDescription", "In-game /players HUD slider for D2RLoader."
-      VALUE "FileVersion", "1.1.17"
+      VALUE "FileVersion", "1.1.18"
       VALUE "InternalName", "players-hud-slider"
       VALUE "OriginalFilename", "d2rl-players-hud-slider.dll"
       VALUE "ProductName", "Players HUD Slider"
-      VALUE "ProductVersion", "1.1.17"
+      VALUE "ProductVersion", "1.1.18"
     END
   END
   BLOCK "VarFileInfo"

@@ -1,6 +1,6 @@
-cmake_minimum_required(VERSION 3.28)
+cmake_minimum_required(VERSION 3.29)
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
-    project(PlayersHudSlider VERSION 1.1.17 LANGUAGES CXX RC)
+    project(PlayersHudSlider VERSION 1.1.18 LANGUAGES CXX RC)
     set(PLAYERS_HUD_PLUGIN_SDK_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/PluginSDK")
     add_library(D2RLPlugin INTERFACE)
     add_library(D2RLPlugin::D2RLPlugin ALIAS D2RLPlugin)
@@ -63,7 +63,11 @@ set_property(SOURCE src/plugin.rc APPEND PROPERTY OBJECT_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/assets/native/native-track.sprite"
     "${CMAKE_CURRENT_SOURCE_DIR}/assets/native/native-marker.sprite"
     "${CMAKE_CURRENT_SOURCE_DIR}/assets/native/native-tooltip.sprite"
-    "${CMAKE_CURRENT_SOURCE_DIR}/assets/native/native-button.sprite")
+    "${CMAKE_CURRENT_SOURCE_DIR}/assets/native/native-button.sprite"
+    "${CMAKE_CURRENT_SOURCE_DIR}/assets/native/native-track.lowend.sprite"
+    "${CMAKE_CURRENT_SOURCE_DIR}/assets/native/native-marker.lowend.sprite"
+    "${CMAKE_CURRENT_SOURCE_DIR}/assets/native/native-tooltip.lowend.sprite"
+    "${CMAKE_CURRENT_SOURCE_DIR}/assets/native/native-button.lowend.sprite")
 set_target_properties(players_hud_slider PROPERTIES
     OUTPUT_NAME "d2rl-players-hud-slider" PREFIX "")
 d2rlplugin_embed_config(TARGET players_hud_slider

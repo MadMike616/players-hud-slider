@@ -33,6 +33,12 @@ enum class UiMessageAction : uint32_t {
 	Consume  = 1,
 };
 
+enum class CharacterHardcoreMode : uint32_t {
+	Unknown  = 0,
+	Softcore = 1,
+	Hardcore = 2,
+};
+
 enum class ItemTooltipRegion : uint32_t {
 	Description  = 0,
 	Attributes   = 1,
@@ -74,50 +80,54 @@ enum class ItemTooltipFallback : uint32_t {
 // trailing null byte. After writing, set length and keep text[length] equal to
 // '\0'.
 struct ItemTooltipEvent {
-		uint32_t   structSize;
-		uint32_t   flags;
-		ItemHandle item;
-		char*      text;
-		uint32_t   length;
-		uint32_t   capacity;
+	uint32_t   structSize;
+	uint32_t   flags;
+	ItemHandle item;
+	char*      text;
+	uint32_t   length;
+	uint32_t   capacity;
 };
 
 struct UiMessageEvent {
-		uint32_t    structSize;
-		uint32_t    flags;
-		uint64_t    targetHash;
-		uint64_t    commandHash;
-		const char* target;
-		const char* command;
-		const char* text;
+	uint32_t              structSize;
+	uint32_t              flags;
+	uint64_t              targetHash;
+	uint64_t              commandHash;
+	const char*           target;
+	const char*           command;
+	const char*           text;
+	CharacterHardcoreMode characterHardcoreMode;
+	uint32_t              reserved;
 };
 
 // UI message strings are borrowed and remain valid only for the callback.
-// Returning Consume stops lower-priority listeners and normal panel handling.
+// CharacterCreate:Create reports the selected Hardcore/Softcore mode. Other
+// messages report Unknown. Returning Consume stops lower-priority listeners
+// and normal panel handling.
 
 using ItemTooltipCallback = void(__cdecl*)(const PluginContext* context, ItemTooltipEvent* event, void* userData) noexcept;
 using UiMessageCallback   = UiMessageAction(__cdecl*)(const PluginContext* context, const UiMessageEvent* event, void* userData) noexcept;
 
 struct ItemTooltipListener {
-		uint32_t            structSize;
-		uint32_t            flags;
-		int32_t             priority;
-		int32_t             slot;
-		ItemTooltipRegion   region;
-		ItemTooltipPosition position;
-		ItemTooltipAnchor   anchor;
-		ItemTooltipFallback fallback;
-		ItemTooltipCallback callback;
-		void*               userData;
+	uint32_t            structSize;
+	uint32_t            flags;
+	int32_t             priority;
+	int32_t             slot;
+	ItemTooltipRegion   region;
+	ItemTooltipPosition position;
+	ItemTooltipAnchor   anchor;
+	ItemTooltipFallback fallback;
+	ItemTooltipCallback callback;
+	void*               userData;
 };
 
 struct UiMessageListener {
-		uint32_t          structSize;
-		uint32_t          flags;
-		int32_t           priority;
-		uint32_t          reserved;
-		UiMessageCallback callback;
-		void*             userData;
+	uint32_t          structSize;
+	uint32_t          flags;
+	int32_t           priority;
+	uint32_t          reserved;
+	UiMessageCallback callback;
+	void*             userData;
 };
 
 // Top and Bottom require anchor None. AboveAnchor and BelowAnchor require a
@@ -144,6 +154,7 @@ using UnregisterUiMessageListenerFn   = Result(__cdecl*)(const PluginContext* co
 
 static_assert(sizeof(Result) == sizeof(uint32_t));
 static_assert(sizeof(UiMessageAction) == sizeof(uint32_t));
+static_assert(sizeof(CharacterHardcoreMode) == sizeof(uint32_t));
 static_assert(sizeof(ItemTooltipRegion) == sizeof(uint32_t));
 static_assert(sizeof(ItemTooltipPosition) == sizeof(uint32_t));
 static_assert(sizeof(ItemTooltipAnchor) == sizeof(uint32_t));
@@ -153,30 +164,32 @@ static_assert(std::is_standard_layout_v<UiMessageEvent> && std::is_trivially_cop
 static_assert(std::is_standard_layout_v<ItemTooltipListener> && std::is_trivially_copyable_v<ItemTooltipListener>);
 static_assert(std::is_standard_layout_v<UiMessageListener> && std::is_trivially_copyable_v<UiMessageListener>);
 static_assert(sizeof(ItemTooltipEvent) == 32);
-static_assert(sizeof(UiMessageEvent) == 48);
+static_assert(sizeof(UiMessageEvent) == 56);
 static_assert(sizeof(ItemTooltipListener) == 48);
 static_assert(sizeof(UiMessageListener) == 32);
 
 }
 
-struct SharedEventServiceV1 {
-		uint32_t                                      serviceSize;
-		uint32_t                                      serviceVersion;
-		SharedEvents::RegisterItemTooltipListenerFn   registerItemTooltipListener;
-		SharedEvents::UnregisterItemTooltipListenerFn unregisterItemTooltipListener;
-		SharedEvents::RegisterUiMessageListenerFn     registerUiMessageListener;
-		SharedEvents::UnregisterUiMessageListenerFn   unregisterUiMessageListener;
+struct SharedEventService {
+	static constexpr ServiceId Id         = ServiceId::SharedEvent;
+	static constexpr uint32_t  AbiVersion = 1;
+
+	uint32_t                                      serviceSize;
+	uint32_t                                      serviceVersion;
+	SharedEvents::RegisterItemTooltipListenerFn   registerItemTooltipListener;
+	SharedEvents::UnregisterItemTooltipListenerFn unregisterItemTooltipListener;
+	SharedEvents::RegisterUiMessageListenerFn     registerUiMessageListener;
+	SharedEvents::UnregisterUiMessageListenerFn   unregisterUiMessageListener;
 };
 
-inline constexpr uint32_t SharedEventServiceV1Version      = 1;
-inline constexpr uint32_t SharedEventServiceV1Size         = static_cast<uint32_t>(sizeof(SharedEventServiceV1));
-inline constexpr uint32_t SharedEventServiceV1RequiredSize = SharedEventServiceV1Size;
+inline constexpr uint32_t SharedEventServiceSize         = static_cast<uint32_t>(sizeof(SharedEventService));
+inline constexpr uint32_t SharedEventServiceRequiredSize = SharedEventServiceSize;
 
-inline auto HasSharedEventServiceV1Field(const SharedEventServiceV1* service, uint32_t fieldEndOffset) noexcept -> bool {
-	return service != nullptr && service->serviceVersion == SharedEventServiceV1Version && service->serviceSize >= fieldEndOffset;
+inline auto HasSharedEventServiceField(const SharedEventService* service, uint32_t fieldEndOffset) noexcept -> bool {
+	return service != nullptr && service->serviceVersion == SharedEventService::AbiVersion && service->serviceSize >= fieldEndOffset;
 }
 
-static_assert(std::is_standard_layout_v<SharedEventServiceV1> && std::is_trivially_copyable_v<SharedEventServiceV1>);
-static_assert(sizeof(SharedEventServiceV1) == 40);
+static_assert(std::is_standard_layout_v<SharedEventService> && std::is_trivially_copyable_v<SharedEventService>);
+static_assert(sizeof(SharedEventService) == 40);
 
 }

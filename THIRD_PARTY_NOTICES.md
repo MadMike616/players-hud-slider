@@ -2,9 +2,9 @@
 
 ## D2RLoader PluginSDK
 
-The minimal SDK headers and CMake integration under `third_party/PluginSDK`
-are from the official D2RLoader PluginSDK v3, commit
-`4933e2c42cb2592958cd0df3b6dc5003102252d1`. The upstream MIT license and
+The SDK headers and CMake integration under `third_party/PluginSDK`
+are from the official D2RLoader PluginSDK 0.4.0, commit
+`03a5af9e0feb3f95f95e148e330e01f6635950df`. The upstream MIT license and
 vendoring details are included in that directory.
 
 ## toml++

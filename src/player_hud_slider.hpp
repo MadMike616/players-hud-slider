@@ -37,7 +37,7 @@ private:
     static constexpr std::int32_t VirtualLayoutHeight = 1801;
 
     const D2RL::PluginContext* context_{};
-    const D2RL::LifecycleServiceV1* lifecycle_{};
+    const D2RL::LifecycleService* lifecycle_{};
     std::array<D2RL::Lifecycle::ListenerHandle, 3> listeners_{};
     HudPlayerSliderConfig config_{};
     std::int32_t maximumPlayers_{8};

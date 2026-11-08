@@ -11,9 +11,11 @@ struct PluginContext;
 
 namespace Input {
 
-using ActionHandle = uint64_t;
+using ActionHandle      = uint64_t;
+using KeyListenerHandle = uint64_t;
 
-inline constexpr ActionHandle InvalidHandle = 0;
+inline constexpr ActionHandle      InvalidHandle            = 0;
+inline constexpr KeyListenerHandle InvalidKeyListenerHandle = 0;
 
 enum class Result : uint32_t {
 	Success         = 0,
@@ -165,6 +167,36 @@ enum class ActionResult : uint32_t {
 	Handled = 1,
 };
 
+enum class KeyEventKind : uint32_t {
+	Down = 1,
+	Up   = 2,
+};
+
+enum class KeyEventResult : uint32_t {
+	Continue = 0,
+	Block    = 1,
+};
+
+struct KeyEvent {
+	uint32_t          structSize;
+	uint32_t          flags;
+	KeyListenerHandle listener;
+	KeyEventKind      kind;
+	uint32_t          virtualKey;
+	uint32_t          reserved;
+};
+
+using KeyListenerCallback = KeyEventResult(__cdecl*)(const PluginContext* context, const KeyEvent* event, void* userData) noexcept;
+
+// Register a key listener while the plugin loads. It runs before plugin
+// actions and D2R key bindings. Return Block to consume a key event.
+struct KeyListenerRegistration {
+	uint32_t            structSize;
+	uint32_t            flags;
+	KeyListenerCallback callback;
+	void*               userData;
+};
+
 struct Binding {
 	Key      key;
 	Modifier modifier;
@@ -184,8 +216,8 @@ using ActionCallback = ActionResult(__cdecl*)(const PluginContext* context, cons
 // Register actions while the plugin is loading. D2RLoader copies all text and
 // callback fields before returning. Keep logicalId stable, lowercase ASCII, and
 // unique inside the plugin. An empty category uses "Extensions".
-// V1 actions run in the normal in-game keyboard context and do not fire while
-// the player is editing text or binding controls.
+// V1 actions run in the normal in-game keyboard context. A TextEntry plugin
+// panel suppresses actions while its input text box has focus.
 struct ActionRegistration {
 	uint32_t       structSize;
 	uint32_t       flags;
@@ -198,13 +230,20 @@ struct ActionRegistration {
 	void*          userData;
 };
 
-inline constexpr uint32_t BindingSize                    = static_cast<uint32_t>(sizeof(Binding));
-inline constexpr uint32_t ActionEventSize                = static_cast<uint32_t>(sizeof(ActionEvent));
-inline constexpr uint32_t ActionEventRequiredSize        = static_cast<uint32_t>(offsetof(ActionEvent, binding) + sizeof(Binding));
-inline constexpr uint32_t ActionRegistrationSize         = static_cast<uint32_t>(sizeof(ActionRegistration));
-inline constexpr uint32_t ActionRegistrationRequiredSize = static_cast<uint32_t>(offsetof(ActionRegistration, userData) + sizeof(void*));
+inline constexpr uint32_t BindingSize                         = static_cast<uint32_t>(sizeof(Binding));
+inline constexpr uint32_t ActionEventSize                     = static_cast<uint32_t>(sizeof(ActionEvent));
+inline constexpr uint32_t ActionEventRequiredSize             = static_cast<uint32_t>(offsetof(ActionEvent, binding) + sizeof(Binding));
+inline constexpr uint32_t KeyEventSize                        = static_cast<uint32_t>(sizeof(KeyEvent));
+inline constexpr uint32_t KeyListenerRegistrationSize         = static_cast<uint32_t>(sizeof(KeyListenerRegistration));
+inline constexpr uint32_t KeyListenerRegistrationRequiredSize = static_cast<uint32_t>(offsetof(KeyListenerRegistration, userData) + sizeof(void*));
+inline constexpr uint32_t ActionRegistrationSize              = static_cast<uint32_t>(sizeof(ActionRegistration));
+inline constexpr uint32_t ActionRegistrationRequiredSize      = static_cast<uint32_t>(offsetof(ActionRegistration, userData) + sizeof(void*));
 
 inline auto HasActionEventField(const ActionEvent* event, uint32_t fieldEndOffset) noexcept -> bool {
+	return event != nullptr && event->structSize >= fieldEndOffset;
+}
+
+inline auto HasKeyEventField(const KeyEvent* event, uint32_t fieldEndOffset) noexcept -> bool {
 	return event != nullptr && event->structSize >= fieldEndOffset;
 }
 
@@ -218,22 +257,33 @@ using UnregisterActionFn = Result(__cdecl*)(const PluginContext* context, Action
 
 using GetBindingFn = Result(__cdecl*)(const PluginContext* context, ActionHandle action, BindingSlot slot, Binding* binding) noexcept;
 
+using RegisterKeyListenerFn = Result(__cdecl*)(const PluginContext* context, const KeyListenerRegistration* registration, KeyListenerHandle* listener) noexcept;
+
+using UnregisterKeyListenerFn = Result(__cdecl*)(const PluginContext* context, KeyListenerHandle listener) noexcept;
+
 } // namespace Input
 
-struct InputServiceV1 {
-	uint32_t                  serviceSize;
-	uint32_t                  serviceVersion;
-	Input::RegisterActionFn   registerAction;
-	Input::UnregisterActionFn unregisterAction;
-	Input::GetBindingFn       getBinding;
+struct InputService {
+	static constexpr ServiceId Id         = ServiceId::Input;
+	static constexpr uint32_t  AbiVersion = 1;
+
+	uint32_t                       serviceSize;
+	uint32_t                       serviceVersion;
+	Input::RegisterActionFn        registerAction;
+	Input::UnregisterActionFn      unregisterAction;
+	Input::GetBindingFn            getBinding;
+	Input::RegisterKeyListenerFn   registerKeyListener;
+	Input::UnregisterKeyListenerFn unregisterKeyListener;
 };
 
-inline constexpr uint32_t InputServiceV1Version      = 1;
-inline constexpr uint32_t InputServiceV1Size         = static_cast<uint32_t>(sizeof(InputServiceV1));
-inline constexpr uint32_t InputServiceV1RequiredSize = static_cast<uint32_t>(offsetof(InputServiceV1, getBinding) + sizeof(Input::GetBindingFn));
+inline constexpr uint32_t InputServiceSize                          = static_cast<uint32_t>(sizeof(InputService));
+inline constexpr uint32_t InputServiceRequiredSize                  = static_cast<uint32_t>(offsetof(InputService, getBinding) + sizeof(Input::GetBindingFn));
+// Check these field ends before calling the appended key-listener functions.
+inline constexpr uint32_t InputServiceRegisterKeyListenerFieldEnd   = static_cast<uint32_t>(offsetof(InputService, registerKeyListener) + sizeof(Input::RegisterKeyListenerFn));
+inline constexpr uint32_t InputServiceUnregisterKeyListenerFieldEnd = static_cast<uint32_t>(offsetof(InputService, unregisterKeyListener) + sizeof(Input::UnregisterKeyListenerFn));
 
-inline auto HasInputServiceV1Field(const InputServiceV1* service, uint32_t fieldEndOffset) noexcept -> bool {
-	return service != nullptr && service->serviceVersion == InputServiceV1Version && service->serviceSize >= fieldEndOffset;
+inline auto HasInputServiceField(const InputService* service, uint32_t fieldEndOffset) noexcept -> bool {
+	return service != nullptr && service->serviceVersion == InputService::AbiVersion && service->serviceSize >= fieldEndOffset;
 }
 
 static_assert(sizeof(Input::Key) == sizeof(uint32_t));
@@ -243,6 +293,16 @@ static_assert(sizeof(Input::ActionEventKind) == sizeof(uint32_t));
 static_assert(sizeof(Input::ActionResult) == sizeof(uint32_t));
 static_assert(sizeof(Input::Result) == sizeof(uint32_t));
 static_assert(sizeof(Input::ActionHandle) == sizeof(uint64_t));
+static_assert(sizeof(Input::KeyListenerHandle) == sizeof(uint64_t));
+static_assert(sizeof(Input::KeyEventKind) == sizeof(uint32_t));
+static_assert(sizeof(Input::KeyEventResult) == sizeof(uint32_t));
+static_assert(offsetof(Input::KeyEvent, listener) == 8);
+static_assert(offsetof(Input::KeyEvent, kind) == 16);
+static_assert(offsetof(Input::KeyEvent, virtualKey) == 20);
+static_assert(sizeof(Input::KeyEvent) == 32);
+static_assert(offsetof(Input::KeyListenerRegistration, callback) == 8);
+static_assert(offsetof(Input::KeyListenerRegistration, userData) == 16);
+static_assert(sizeof(Input::KeyListenerRegistration) == 24);
 static_assert(std::is_standard_layout_v<Input::Binding>);
 static_assert(std::is_trivially_copyable_v<Input::Binding>);
 static_assert(offsetof(Input::Binding, key) == 0);
@@ -264,14 +324,18 @@ static_assert(offsetof(Input::ActionRegistration, defaultSecondary) == 40);
 static_assert(offsetof(Input::ActionRegistration, callback) == 48);
 static_assert(offsetof(Input::ActionRegistration, userData) == 56);
 static_assert(sizeof(Input::ActionRegistration) == 64);
-static_assert(std::is_standard_layout_v<InputServiceV1>);
-static_assert(std::is_trivially_copyable_v<InputServiceV1>);
-static_assert(offsetof(InputServiceV1, serviceSize) == 0);
-static_assert(offsetof(InputServiceV1, serviceVersion) == 4);
-static_assert(offsetof(InputServiceV1, registerAction) == 8);
-static_assert(offsetof(InputServiceV1, unregisterAction) == 16);
-static_assert(offsetof(InputServiceV1, getBinding) == 24);
-static_assert(InputServiceV1RequiredSize == 32);
-static_assert(sizeof(InputServiceV1) == 32);
+static_assert(std::is_standard_layout_v<InputService>);
+static_assert(std::is_trivially_copyable_v<InputService>);
+static_assert(offsetof(InputService, serviceSize) == 0);
+static_assert(offsetof(InputService, serviceVersion) == 4);
+static_assert(offsetof(InputService, registerAction) == 8);
+static_assert(offsetof(InputService, unregisterAction) == 16);
+static_assert(offsetof(InputService, getBinding) == 24);
+static_assert(offsetof(InputService, registerKeyListener) == 32);
+static_assert(offsetof(InputService, unregisterKeyListener) == 40);
+static_assert(InputServiceRequiredSize == 32);
+static_assert(InputServiceRegisterKeyListenerFieldEnd == 40);
+static_assert(InputServiceUnregisterKeyListenerFieldEnd == 48);
+static_assert(sizeof(InputService) == 48);
 
 } // namespace D2RL
